@@ -9,15 +9,20 @@ def find_closest_substring(sentence: str, query: str) -> str:
     min_distance = float('inf')
 
     # Iterate over all possible substrings of the sentence
-    for i in range(len(sentence) - len(query) + 1):
-        substring = sentence[i:i + len(query)]
-        # Calculate the Levenshtein distance
-        distance = lev.distance(substring, query)
-        # Check if this is the best match so far with at most one edit
-        if distance <= 1 and distance < min_distance:
-            best_match = substring
-            min_distance = distance
+    for i in range(len(sentence)):
+        for j in range(i, len(sentence) + 1):
+            substring = sentence[i:j]
+            # Skip substrings that are too different in length
+            if abs(len(substring) - len(query)) > 1:
+                continue
+            # Calculate the Levenshtein distance
+            distance = lev.distance(substring, query)
+            # Check if this is the best match so far with at most one edit
+            if distance <= 1 and distance < min_distance:
+                best_match = substring
+                min_distance = distance
 
+    # If no match found within edit distance 1, return None
     return best_match
 
 
@@ -29,15 +34,15 @@ def calculate_score(sentence: str, query: str) -> int:
     query = normalize(query)
     sentence = normalize(sentence)
 
-    print("\n")
-    print(query)
+    # print("\n")
+    # print(query)
     # print(sentence)
 
     best_substring = find_closest_substring(sentence, query)
-    print(best_substring)
+    # print(best_substring)
     matching_chars = sum(1 for a, b in zip(best_substring, query) if a == b)
     base_score = matching_chars * 2
-    print(base_score)
+    # print(base_score)
 
     # Get edit operations
     operations = editops(query, best_substring)
@@ -56,7 +61,7 @@ def calculate_score(sentence: str, query: str) -> int:
             else:
                 score_reduction += 2
 
-    print(base_score, '-', score_reduction)
+    # print(base_score, '-', score_reduction)
     # Calculate final score
     final_score = max(0, base_score - score_reduction)
 
